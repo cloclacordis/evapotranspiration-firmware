@@ -1,0 +1,22 @@
+#include <zephyr/dt-bindings/clock/stm32f4_clock.h>
+
+/* External 32.768 kHz crystal */
+&clk_lse {
+    status = "okay";
+};
+
+/* RTC clock configuration */
+&rtc {
+    clocks = <&rcc STM32_CLOCK(APB1, 28)>,
+             <&rcc STM32_SRC_LSE RTC_SEL(1)>;
+
+    async-prescaler = <127>;
+    sync-prescaler  = <255>;
+
+    status = "okay";
+};
+
+/* RTC backup registers */
+&bbram {
+    status = "okay";
+};

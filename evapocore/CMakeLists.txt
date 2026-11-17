@@ -1,0 +1,158 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2026 Tim Alexeenko
+# E-mail: <cloclacordis@proton.me>
+
+cmake_minimum_required(VERSION 3.28.0)
+project(FAO56 C)
+
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+
+option(ENABLE_SANITIZERS "Enable AddressSanitizer and UndefinedBehaviorSanitizer" OFF)
+
+### ## # Source code files # ## ###
+set(FAO56_SOURCES
+        01-measurement/011-air-temperature-read/air-temperature-read.c
+        01-measurement/011-air-temperature-read/air-temperature-read.h
+
+        01-measurement/012-air-humidity-read/air-humidity-read.c
+        01-measurement/012-air-humidity-read/air-humidity-read.h
+
+        01-measurement/013-atm-pressure-read/atm-pressure-read.c
+        01-measurement/013-atm-pressure-read/atm-pressure-read.h
+
+        01-measurement/014-sunshine-lux-read/sunshine-lux-read.c
+        01-measurement/014-sunshine-lux-read/sunshine-lux-read.h
+
+        01-measurement/015-wind-speed-read/wind-speed-read.c
+        01-measurement/015-wind-speed-read/wind-speed-read.h
+
+        02-providers/021-date-provider/date-provider.c
+        02-providers/021-date-provider/date-provider.h
+
+        02-providers/022-configurations/deployment-config.h
+
+        02-providers/023-time/calendar-time.c
+        02-providers/023-time/calendar-time.h
+        02-providers/023-time/time-provider.h
+
+        02-providers/023-time/time-provider-host.c
+
+        03-validation/031-value-source/value-source.c
+        03-validation/031-value-source/value-source.h
+
+        03-validation/032-validation/validation.c
+        03-validation/032-validation/validation.h
+
+        03-validation/033-status/status.c
+        03-validation/033-status/status.h
+
+        03-validation/034-math-utils/math-utils.h
+
+        04-calculation/041-air-temperature-calc/air-temperature-calc.c
+        04-calculation/041-air-temperature-calc/air-temperature-calc.h
+
+        04-calculation/042-air-humidity-calc/air-humidity-calc.c
+        04-calculation/042-air-humidity-calc/air-humidity-calc.h
+
+        04-calculation/043-vapour-pressure-calc/vapour-pressure-calc.c
+        04-calculation/043-vapour-pressure-calc/vapour-pressure-calc.h
+
+        04-calculation/044-atmospheric-calc/atm-pressure-model.c
+        04-calculation/044-atmospheric-calc/atm-pressure-model.h
+
+        04-calculation/044-atmospheric-calc/psychrometric-calc.c
+        04-calculation/044-atmospheric-calc/psychrometric-calc.h
+
+        04-calculation/045-radiation-calc/geolocation-calc.c
+        04-calculation/045-radiation-calc/geolocation-calc.h
+
+        04-calculation/045-radiation-calc/day-in-year-calc.c
+        04-calculation/045-radiation-calc/day-in-year-calc.h
+
+        04-calculation/045-radiation-calc/sunshine-lux-calc.c
+        04-calculation/045-radiation-calc/sunshine-lux-calc.h
+
+        04-calculation/045-radiation-calc/extrater-radiation-calc.c
+        04-calculation/045-radiation-calc/extrater-radiation-calc.h
+
+        04-calculation/045-radiation-calc/solar-radiation-calc.c
+        04-calculation/045-radiation-calc/solar-radiation-calc.h
+
+        04-calculation/045-radiation-calc/net-radiation-calc.c
+        04-calculation/045-radiation-calc/net-radiation-calc.h
+
+        04-calculation/046-wind-speed-calc/wind-speed-calc.c
+        04-calculation/046-wind-speed-calc/wind-speed-calc.h
+
+        04-calculation/047-evapotranspiration-calc/eto-calc.c
+        04-calculation/047-evapotranspiration-calc/eto-calc.h
+
+        05-orchestration/daily-cycle.c
+        05-orchestration/daily-cycle.h
+)
+
+### ## # Target 1: application binary [orchestration] # ## ###
+add_executable(fao56_app
+        ${FAO56_SOURCES}
+        05-orchestration/main-evapocore.c
+)
+
+target_link_libraries(fao56_app m)
+set_target_properties(fao56_app PROPERTIES C_EXTENSIONS OFF)
+target_compile_options(fao56_app PRIVATE -Wall -Wextra -Wpedantic
+        -Wfloat-equal -Wconversion -Wshadow -Werror)
+
+### ## # Target 2: test binary # ## ###
+include(FetchContent)
+
+FetchContent_Declare(
+        unity
+        GIT_REPOSITORY https://github.com/ThrowTheSwitch/Unity.git
+        GIT_TAG        v2.6.0
+)
+
+FetchContent_MakeAvailable(unity)
+
+add_executable(fao56_test
+        ${FAO56_SOURCES}
+        06-test/test-config.h
+        06-test/main-evapocore-test.c
+)
+
+target_link_libraries(fao56_test m unity)
+target_compile_definitions(unity PUBLIC UNITY_INCLUDE_DOUBLE)
+target_compile_options(fao56_test PRIVATE -Wall -Wextra -Wpedantic
+        -Wfloat-equal -Wconversion -Wshadow -Werror)
+
+if(ENABLE_SANITIZERS)
+    target_compile_options(fao56_test PRIVATE
+            -fsanitize=address,undefined
+            -fno-omit-frame-pointer
+            -g
+    )
+
+    target_link_options(fao56_test PRIVATE
+            -fsanitize=address,undefined
+    )
+endif()
+
+### ## # Target 3: Gregorian conversion and the platform-independent time API tests;
+#### ### a deterministic TimeProvider_ReadTimestamp() test double # ### ### # ## ###
+add_executable(fao56_time_test
+        06-test/time-test.c
+        03-validation/033-status/status.c
+        02-providers/023-time/calendar-time.c
+        02-providers/021-date-provider/date-provider.c
+)
+
+target_link_libraries(fao56_time_test m unity)
+set_target_properties(fao56_time_test PROPERTIES C_EXTENSIONS OFF)
+target_compile_options(fao56_time_test PRIVATE -Wall -Wextra -Wpedantic
+        -Wfloat-equal -Wconversion -Wshadow -Werror)
+
+
+# CTest
+enable_testing()
+add_test(NAME fao56_suite COMMAND fao56_test)
+add_test(NAME fao56_time_suite COMMAND fao56_time_test)

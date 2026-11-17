@@ -1,0 +1,35 @@
+name: Zephyr Build
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  firmware:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout application
+        uses: actions/checkout@v7
+        with:
+          path: applications/evapotranspiration-firmware
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Set up Zephyr workspace and SDK
+        uses: zephyrproject-rtos/action-zephyr-setup@v1.0.15
+        with:
+          app-path: applications/evapotranspiration-firmware
+          west-version: 1.5.0
+          sdk-version: 1.0.1
+          toolchains: arm-zephyr-eabi
+
+      - name: Build firmware
+        working-directory: applications/evapotranspiration-firmware
+        run: west build -p always -b nucleo_f446re -d build-zephyr .
