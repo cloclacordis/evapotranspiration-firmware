@@ -2,7 +2,7 @@
 
 ## Implementation
 
-Ported the existing [`FieldEdge-Evapotranspiration`](https://github.com/cloclacordis/FieldEdge-Evapotranspiration) bare-metal STM32 application to Zephyr RTOS 4.5.0 on the Nucleo-F446RE board (STM32F446RET6 MCU).
+Ported the existing [`EvapoCore`](https://github.com/cloclacordis/evapocore) bare-metal STM32 firmware to Zephyr RTOS 4.5.0 on the Nucleo-F446RE board (STM32F446RET6 MCU).
 
 The existing EvapoCore computation pipeline was preserved. Platform-specific services were migrated to Zephyr, including:
 
