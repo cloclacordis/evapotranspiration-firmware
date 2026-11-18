@@ -6,7 +6,7 @@
 
 **Evapotranspiration Firmware** is a Zephyr-based embedded application for calculating reference evapotranspiration according to the [`FAO-56 Penman–Monteith methodology`](https://agrhysmo.agr.unipi.it/wp-content/uploads/2025/09/FAO56%202025.pdf).
 
-The firmware is built around **EvapoCore**, a portable C computation kernel originally developed and documented in [`FieldEdge-Evapotranspiration`](https://github.com/cloclacordis/FieldEdge-Evapotranspiration). The computation kernel remains independent of Zephyr; the platform layer provides the target-specific services.
+The firmware is built around a portable C17 computation kernel originally developed and documented as [`EvapoCore`](https://github.com/cloclacordis/evapocore). The computation kernel remains independent of Zephyr; the platform layer provides the target-specific services.
 
 The current baseline targets the **STM32F446RE Nucleo-64** and **Zephyr RTOS 4.5.0**. The application is **in active development** (sensor inputs are currently emulated).
 
@@ -51,7 +51,7 @@ python tools/rtc/rtc-set.py --port /dev/ttyACM0
 
 See [`devlog`](docs/devlogs/devlog01-zephyr-baseline-port.md) for details of the build, flashing, and hardware verification.
 
-## Computation kernel build, run, and test
+## Computation core build, run, and test
 
 EvapoCore can also be built and tested on the host (requires CMake 3.28 or later and a C17-compatible C compiler):
 
@@ -71,4 +71,4 @@ ctest --test-dir build-sanitize -R '^fao56_suite$' --output-on-failure
 
 ## License
 
-This repository is distributed under the [`Apache License 2.0`](LICENSE). EvapoCore is also available under AGPL-3.0 in the original [`FieldEdge-Evapotranspiration`](https://github.com/cloclacordis/FieldEdge-Evapotranspiration) repository. Third-party components remain under their original licenses.
+This repository is distributed under the [`Apache License 2.0`](LICENSE). EvapoCore is also available under AGPL-3.0 in the [`original repository`](https://github.com/cloclacordis/evapocore). Third-party components remain under their original licenses.
