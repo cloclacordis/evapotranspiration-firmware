@@ -6,7 +6,7 @@
 
 **Evapotranspiration Firmware** is a Zephyr-based embedded application for calculating reference evapotranspiration according to the [`FAO-56 Penman–Monteith methodology`](https://agrhysmo.agr.unipi.it/wp-content/uploads/2025/09/FAO56%202025.pdf).
 
-The firmware is built around a portable C17 computation kernel originally developed and documented as [`EvapoCore`](https://github.com/cloclacordis/evapocore). The computation kernel remains independent of Zephyr; the platform layer provides the target-specific services.
+The firmware is built around a portable C17 computation core originally developed and documented as [`EvapoCore`](https://github.com/cloclacordis/evapocore). The computation core remains independent of Zephyr; the platform layer provides the target-specific services.
 
 The current baseline targets the **STM32F446RE Nucleo-64** and **Zephyr RTOS 4.5.0**. The application is **in active development** (sensor inputs are currently emulated).
 
@@ -61,7 +61,7 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-To run the FAO-56 computation kernel test suite with AddressSanitizer and UndefinedBehaviorSanitizer:
+To run the FAO-56 computation core test suite with AddressSanitizer and UndefinedBehaviorSanitizer:
 
 ```bash
 cmake -S evapocore -B build-sanitize -DENABLE_SANITIZERS=ON
