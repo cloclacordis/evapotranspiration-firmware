@@ -53,7 +53,7 @@ See [`devlog`](docs/devlogs/devlog01-zephyr-baseline-port.md) for details of the
 
 ## Computation core build, run, and test
 
-EvapoCore can also be built and tested on the host (requires CMake 3.28 or later and a C17-compatible C compiler):
+EvapoCore can also be built and tested on the host (requires CMake 3.28 or later and a C17-compatible compiler):
 
 ```bash
 cmake -S evapocore -B build
